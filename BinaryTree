@@ -1,0 +1,267 @@
+struct BinaryTreeNode//构造节点
+{
+	BinaryTreeNode(T& data)
+	:_data(data)
+	, _pLeftChild(NULL)
+	, _pRighChild(NULL)
+	{}
+	T _data;
+	BinaryTreeNode<T>* _pLeftChild;
+	BinaryTreeNode<T>* _pRighChild;
+
+};
+template<class T>
+class BinaryTree
+{
+public:
+	BinaryTree()
+		:_pRoot(NULL)
+	{}
+	BinaryTree(char* array,size_t size)//构造函数
+  {
+		size_t index = 0;
+		_createBinTree(_pRoot,array,size,index);
+	}
+	BinaryTree( BinaryTree<T>& t)//拷贝构造函数
+{
+		if (t._pRoot!= NULL)
+		{
+			_pRoot= _copyBInTree(t._pRoot);
+		}
+	}
+	BinaryTree& operator =(BinaryTree<T>& t)//赋值操作符	重载
+  {
+		if (this != &t)
+		{
+			_Destroy(_pRoot);
+		}
+		_pRoot=_copyBInTree(t._pRoot);
+		return *this;
+	}
+	~BinaryTree()//析构函数	
+{
+		_Destroy(_pRoot);
+	}
+	void _Destroy()//销毁函数
+{
+		_Destroy(_pRoot);
+
+	}
+void _preOder()//前序遍历二叉树
+{
+	cout << "preOder:" << endl;
+	_preOder(_pRoot);
+	cout << endl;
+}
+void _InOder()//中序遍历二叉树
+{
+	cout << "InOder:" << endl;
+	_InOder(_pRoot);
+	cout << endl;
+}
+void _postOder()//后序遍历二叉树
+{
+	cout << "postOder:" << endl;
+	_postOder(_pRoot);
+	cout << endl;
+}
+private:
+//构建二叉树
+void _createBinTree(BinaryTreeNode<T>*& pRoot, T* array,size_t  size,size_t& index)
+	{
+		
+		if (pRoot == NULL&&array[index] != '#'&&index < size)
+		{
+			pRoot = new BinaryTreeNode<T>(array[index]);//首先创建根节点
+      _createBinTree(pRoot->_pLeftChild, array, size, ++index);//创建左子树
+      _createBinTree(pRoot->_pRighChild, array, size, ++index);//创建右子树	
+    }
+	}
+	BinaryTreeNode<T>*& _copyBInTree( BinaryTreeNode<T>*& pRoot)//复制	一颗二叉树
+  {
+		BinaryTreeNode<T>* retRoot;
+		if (pRoot)
+		{
+			retRoot = new BinaryTreeNode<T>(pRoot->_data);
+			retRoot->_pLeftChild = _copyBInTree(pRoot->_pLeftChild);
+			retRoot->_pRighChild = _copyBInTree(pRoot->_pRighChild);
+			return retRoot;
+		}
+		
+	}
+  //前序遍历二叉树	
+void _preOder(BinaryTreeNode<T>* pRoot)
+	{
+		if (pRoot)
+		{
+			cout << pRoot->_data << " ";
+			_preOder(pRoot->_pLeftChild);
+			_preOder(pRoot->_pRighChild);
+		}
+		
+	}
+  //中序遍历二叉树	
+void _InOder(BinaryTreeNode<T>* pRoot)
+	{
+		if (pRoot)
+		{
+			_InOder(pRoot->_pLeftChild);
+			cout << pRoot->_data << " ";
+			_InOder(pRoot->_pRighChild);
+		}
+		
+	}
+  //后序遍历二叉树	
+void _postOder(BinaryTreeNode<T>* pRoot)
+	{
+		if (pRoot)
+		{
+			_postOder(pRoot->_pLeftChild);
+			cout << pRoot->_data << " ";
+			_postOder(pRoot->_pRighChild);
+		}
+		
+	}
+  //销毁二叉树	
+void _Destroy(BinaryTreeNode<T>* pRoot)
+	{
+		if (pRoot)
+		{
+			_Destroy(pRoot->_pLeftChild);
+			_Destroy(pRoot->_pRighChild);
+			delete pRoot;
+			pRoot = NULL;
+		}
+
+	}
+private:
+	BinaryTreeNode<T>* _pRoot;
+};
+//非递归操作
+//前序非递归遍历（栈）
+void _preOder_Nor(BinaryTreeNode<T>* pRoot)
+	{
+		if(pRoot==NULL)
+			return;
+		stack<BinaryTreeNode<T>*> s;
+		s.push(pRoot);
+		while (!s.empty())
+		{
+			BinaryTreeNode<T>* pCur = s.top();
+			cout << pCur->_data << " ";
+			s.pop();
+			if (pCur->_pRighChild)
+				s.push(pCur->_pRighChild);
+			if (pCur->_pLeftChild)
+				s.push(pCur->_pLeftChild);
+		}
+	}
+  //中序非递归遍历（栈）
+void _InOder_Nor(BinaryTreeNode<T>* pRoot)
+	{
+		if (pRoot == NULL)
+
+			return;
+		stack<BinaryTreeNode<T>*> s;
+		BinaryTreeNode<T>* pCur = pRoot;
+		while (pCur || !s.empty())
+		{
+			while (pCur)
+			{
+				s.push(pCur);
+				pCur = pCur->_pLeftChild;
+			}
+			BinaryTreeNode<T>* pTop = s.top();
+			cout << pTop->_data << " ";
+			s.pop();
+			pCur = pTop->_pRighChild;
+				
+		}
+	}
+  //后序非递归遍历（队列）
+void _postOder_Nor(BinaryTreeNode<T>* pRoot)
+	{
+		if (pRoot == NULL)
+
+			return;
+		stack<BinaryTreeNode<T>*> s;
+		BinaryTreeNode<T>* pre = NULL;
+		BinaryTreeNode<T>* pCur = pRoot;
+		while (pCur || !s.empty())
+		{
+			while (pCur)
+			{
+				s.push(pCur);
+				pCur = pCur->_pLeftChild;
+			}
+			
+			BinaryTreeNode<T>* pTop = s.top();
+			if (pTop->_pRighChild == NULL || pre->_data == pTop->_pRighChild->_data)
+			{
+				cout << pTop->_data << " ";
+				s.pop();
+				pre = pTop;
+			}
+			else
+			{
+				pCur = pTop->_pRighChild;
+			}
+		}
+	}
+  //层序遍历
+void _LevelOder(BinaryTreeNode<T>* pRoot)
+	{
+		if (pRoot == NULL)
+			return;
+		queue<BinaryTreeNode<T>*> q;
+		q.push(pRoot);
+		while (!q.empty())
+		{
+			BinaryTreeNode<T>* pCur = q.front();
+			cout << pCur->_data << " ";
+			if (pCur->_pLeftChild)
+				q.push(pCur->_pLeftChild);
+			if (pCur->_pRighChild)
+				q.push(pCur->_pRighChild);
+			q.pop();
+		}
+	}
+  //求树高
+  size_t  GetHight(BinaryTreeNode<T>* pRoot)
+	{
+		if (pRoot == NULL)
+			return 0;
+		if (pRoot->_pLeftChild == NULL&&pRoot->_pRighChild == NULL)
+			return 1;
+		size_t leftHight = GetHight(pRoot->_pLeftChild);
+		size_t rightHight = GetHight(pRoot->_pRighChild);
+		return (leftHight >= rightHight) ? leftHight + 1 : rightHight + 1;
+	}
+  //寻找某一个节点
+  BinaryTreeNode<T>* Find(BinaryTreeNode<T>* pRoot,T data)
+	{
+		if (pRoot == NULL)
+			return NULL;
+		if (data == pRoot->_data)
+			return pRoot;
+		
+		if ( Find(pRoot->_pLeftChild, data))
+			return Find(pRoot->_pLeftChild, data);
+		else
+
+		return Find(pRoot->_pRighChild,data);
+	}
+  //寻找双亲结点
+  BinaryTreeNode<T>* GetParent(BinaryTreeNode<T>* pRoot, BinaryTreeNode<T>* pCur)
+	{
+		
+		if (pCur == NULL || pRoot == NULL || pRoot == pCur)
+			return NULL;
+		if (pCur == pRoot->_pLeftChild || pCur == pRoot->_pRighChild)
+			return pRoot;
+	
+		if (GetParent(pRoot->_pLeftChild, pCur))
+			return GetParent(pRoot->_pLeftChild, pCur);
+		else
+			return  GetParent(pRoot->_pRighChild,pCur);
+	}
